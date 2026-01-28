@@ -76,6 +76,8 @@
         .btn { display: block; width: 100%; padding: 18px; margin: 15px 0; border-radius: 50px; text-decoration: none; font-weight: 900; text-transform: uppercase; font-size: 0.8rem; color: white; text-align: center; }
         .btn-wa { background: var(--pink); box-shadow: 0 5px 15px rgba(255, 0, 127, 0.4); }
         .btn-maps { border: 2px solid var(--cyan); background: transparent; color: var(--cyan); }
+        
+        .rules { font-size: 0.6rem; line-height: 1.4; color: #ff3333; font-weight: 800; margin-top: 15px; text-transform: uppercase; letter-spacing: 1px; }
     </style>
 </head>
 <body onclick="initExperience()">
@@ -124,7 +126,13 @@
             <div class="card">
                 <a href="https://wa.me/525587216277?text=¡Confirmado! Ahí estaré en tus 21 🥳" class="btn btn-wa">CONFIRMAR</a>
                 <a href="https://maps.app.goo.gl/owEFqCyhBGL8yNVZ7?g_st=iwb" class="btn btn-maps" target="_blank">UBICACIÓN</a>
-                <p style="color: #ffcc00; font-size: 0.65rem; margin-top: 15px; font-weight: 900;">⚠️ TRAE LO QUE QUIERAS TOMAR</p>
+                
+                <p style="color: #ffcc00; font-size: 0.75rem; margin-top: 20px; font-weight: 900; letter-spacing: 1px;">🥤 TRAE TU BEBIDA FAVORITA</p>
+                
+                <div class="rules">
+                    🚫 NO ARMAS • 🚫 NO DROGAS • 🚫 0 BRONCAS<br>
+                    🛡️ TENDREMOS SEGURIDAD PRIVADA
+                </div>
             </div>
         </div>
     </div>
@@ -141,7 +149,6 @@
             audio.volume = 1;
             audio.play();
 
-            // Fade out a los 35 segundos
             setTimeout(() => {
                 let fade = setInterval(() => {
                     if (audio.volume > 0.05) audio.volume -= 0.05;
@@ -165,7 +172,6 @@
             }, 4000);
         }
 
-        // Contador
         const target = new Date("Feb 21, 2026 20:00:00").getTime();
         setInterval(() => {
             const now = new Date().getTime();
@@ -178,7 +184,6 @@
             }
         }, 1000);
 
-        // Láseres
         const canvas = document.getElementById('tunnelCanvas');
         const ctx = canvas.getContext('2d');
         function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }

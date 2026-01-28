@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mis 21 | Hanni's Party</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pink: #ff007f;
+            --cyan: #00f2ff;
+            --dark: #000000;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            background: var(--dark);
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            overflow: hidden; /* Controlado por el JS de scroll */
+        }
+
+        /* TUNEL DE LÁSERES - Background Canvas */
+        #tunnelCanvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+        }
+
+        /* INTRO CON BARRA DE CARGA Y DESTELLOS */
+        #intro-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: black;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            text-align: center;
+            transition: opacity 0.8s ease;
+        }
+
+        #intro-text {
+            font-family: 'Pacifico', cursive;
+            color: var(--pink);
+            font-size: 1.5rem; /* Ajustado para móviles */
+            padding: 10px;
+            text-shadow: 0 0 15px var(--pink);
+            margin-bottom: 20px;
+            opacity: 0; /* Aparece con la carga */
+            animation: fadeIn 1s forwards 2s; /* Aparece después de 2s */
+        }
+
+        #loading-bar-container {
+            width: 80%;
+            max-width: 300px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #loading-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--cyan), var(--pink));
+            transition: width 3s ease-out; /* Velocidad de carga */
+            position: relative;
+        }
+
+        #loading-bar::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 0; bottom: 0;
+            width: 20px; /* Tamaño del destello */
+            background: rgba(255, 255, 255, 0.6);
+            filter: blur(5px);
+            animation: bar-shine 1s infinite;
+        }
+
+        @keyframes bar-shine {
+            0% { transform: translateX(-100px); }
+            50% { transform: translateX(0px); }
+            100% { transform: translateX(100px); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Contenido principal con scroll */
+        .scroll-container {
+            width: 100%;
+            height: 100%;
+            overflow-y: auto; /* Permite scroll vertical */
+            -webkit-overflow-scrolling: touch; /* Scroll suave en iOS */
+            padding: 15px; /* Padding para evitar que el contenido toque los bordes */
+            display: none; /* Se muestra después de la intro */
+        }
+
+        .section-wrapper {
+            margin: 20px auto;
+            max-width: 340px;
+            width: 100%;
+            background: linear-gradient(45deg, var(--pink), var(--cyan));
+            padding: 3px;
+            border-radius: 25px;
+            box-shadow: 0 0 40px rgba(255, 0, 127, 0.6);
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        .section-wrapper.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .card {
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 22px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        /* FOTO CON BRILLO NEÓN */
+        .photo-container {
+            position: relative;
+            width: 100px; height: 100px;
+            margin: 0 auto 15px;
+            display: inline-block; /* Para que el brillo no se salga */
+        }
+
+        .hanni-photo {
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
+            position: relative;
+            z-index: 2;
+        }
+
+        .photo-glow {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            border-radius: 50%;
+            background: var(--pink);
+            filter: blur(15px);
+            animation: neonPulse 1.5s infinite alternate;
+            z-index: 1;
+        }
+
+        @keyframes neonPulse {
+            from { opacity: 0.4; transform: scale(1); }
+            to { opacity: 1; transform: scale(1.2); }
+        }
+
+        h1 {
+            font-family: 'Pacifico', cursive;
+            font-size: 2.5rem;
+            color: var(--pink);
+            margin: 5px 0;
+        }
+
+        .text-small-caps {
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        /* CONTADOR */
+        .countdown {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+            gap: 5px;
+        }
+
+        .box {
+            background: rgba(255, 255, 255, 0.1);
+            flex: 1;
+            padding: 8px 2px;
+            border-radius: 10px;
+            border: 1px solid var(--cyan);
+        }
+
+        .box span {
+            display: block;
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: var(--cyan);
+        }
+
+        .box small { font-size: 0.5rem; color: #ddd; }
+
+        /* DJ LOCO VIT con degradado y llamas */
+        .dj-section {
+            position: relative;
+            margin-top: 20px;
+            padding-bottom: 20px; /* Espacio para las llamas */
+            overflow: hidden; /* Para contener las llamas */
+        }
+
+        .dj-logo-container {
+            position: relative;
+            display: inline-block; /* Para aplicar llamas alrededor */
+        }
+
+        .dj-logo {
+            width: 120px;
+            filter: brightness(1.2) drop-shadow(0 0 8px var(--pink));
+            background: linear-gradient(45deg, var(--pink), var(--cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: block; /* Para centrar con text-align */
+            margin: 0 auto;
+        }
+
+        /* LLAMAS ALREDEDOR DEL LOGO DJ */
+        .fire-flame {
+            position: absolute;
+            background: radial-gradient(circle at 50% 0%, orange 0%, red 50%, transparent 100%);
+            border-radius: 50%;
+            opacity: 0;
+            animation: flame-pulse 2s infinite alternate ease-in-out;
+        }
+
+        .fire-flame-1 { top: -20px; left: 10%; width: 50px; height: 50px; animation-delay: 0s; }
+        .fire-flame-2 { top: -10px; right: 15%; width: 40px; height: 40px; animation-delay: 0.5s; }
+        .fire-flame-3 { bottom: -10px; left: 20%; width: 60px; height: 60px; animation-delay: 1s; }
+        .fire-flame-4 { bottom: -20px; right: 10%; width: 45px; height: 45px; animation-delay: 1.5s; }
+
+
+        @keyframes flame-pulse {
+            0% { transform: scale(0.8); opacity: 0.4; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+            100% { transform: scale(0.8); opacity: 0.4; }
+        }
+
+
+        .dj-name {
+            font-size: 0.9rem;
+            color: var(--cyan);
+            font-weight: 900;
+            margin-top: 10px;
+        }
+
+        .dj-slogan {
+            font-size: 0.6rem;
+            color: #ddd;
+        }
+
+        /* BOTONES */
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-wa { background: var(--pink); color: white; }
+        .btn-maps { background: transparent; color: white; border: 2px solid var(--cyan); }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: -50%; left: -150%; width: 200%; height: 200%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transform: rotate(45deg);
+            animation: shine 2.5s infinite;
+        }
+
+        @keyframes shine { 100% { left: 150%; } }
+
+        .footer-msg {
+            color: #ffcc00;
+            font-size: 0.7rem;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="tunnelCanvas"></canvas>
+
+    <div id="intro-overlay">
+        <div id="intro-text">
+            FESTEJEMOS MI CUMPLE <br> CON EL MEJOR DESMADRE
+        </div>
+        <div id="loading-bar-container">
+            <div id="loading-bar"></div>
+        </div>
+    </div>
+
+    <div class="scroll-container" id="scrollContainer">
+
+        <div class="section-wrapper">
+            <div class="card">
+                <p class="text-small-caps" style="color: var(--pink);">¡Estás invitada!</p>
+                <div class="photo-container">
+                    <div class="photo-glow"></div>
+                    <img src="hanni.jpeg" alt="Hanni" class="hanni-photo">
+                </div>
+                <h1 style="margin-bottom: 5px;">Hanni</h1>
+                <p class="text-small-caps" style="font-size: 0.6rem; color: #ccc;">Mis 21 Años</p>
+            </div>
+        </div>
+
+        <div class="section-wrapper">
+            <div class="card">
+                <p class="text-small-caps" style="color: var(--pink); margin-bottom: 10px;">¡Solo faltan!</p>
+                <div class="countdown">
+                    <div class="box"><span id="days">00</span><small>DÍAS</small></div>
+                    <div class="box"><span id="hours">00</span><small>HRS</small></div>
+                    <div class="box"><span id="mins">00</span><small>MIN</small></div>
+                    <div class="box"><span id="secs">00</span><small>SEG</small></div>
+                </div>
+                <p style="font-size: 0.7rem; margin-top: 15px;">🗓️ SÁBADO 21 DE FEBRERO 2026</p>
+                <p style="font-size: 0.7rem;">🕒 A PARTIR DE LAS 8:00 PM</p>
+            </div>
+        </div>
+
+        <div class="section-wrapper">
+            <div class="card">
+                <p class="text-small-caps" style="color: var(--pink);">Música por</p>
+                <div class="dj-section">
+                    <div class="dj-logo-container">
+                        <img src="logo.jpeg" alt="DJ LOCO VIT" class="dj-logo">
+                        <div class="fire-flame fire-flame-1"></div>
+                        <div class="fire-flame fire-flame-2"></div>
+                        <div class="fire-flame fire-flame-3"></div>
+                        <div class="fire-flame fire-flame-4"></div>
+                    </div>
+                    <p class="dj-name">DJ LOCO VIT</p>
+                    <p class="dj-slogan">EL MEJOR DESMADRE AMBIENTAL</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-wrapper">
+            <div class="card">
+                <p class="text-small-caps" style="color: var(--pink); margin-bottom: 15px;">¡Te esperamos!</p>
+                <a href="https://wa.me/525587216277?text=¡Confirmado! Ahí estaré para el desmadre 🥳" class="btn btn-wa">CONFIRMAR ASISTENCIA</a>
+                <a href="https://www.google.com/maps/search/?api=1&query=Tu+Dirección+Exacta+Aquí" class="btn btn-maps" target="_blank">VER UBICACIÓN</a>
+                <p class="footer-msg">⚠️ NO OLVIDES LO QUE QUIERAS TOMAR</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- EFECTO TÚNEL LÁSER ---
+        const canvas = document.getElementById('tunnelCanvas');
+        const ctx = canvas.getContext('2d');
+        let lines = [];
+        let numLines = 20; // Más líneas para un túnel más denso
+
+        function initTunnel() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            lines = [];
+            for(let i=0; i<numLines; i++) {
+                lines.push({
+                    angle: (Math.PI * 2 / numLines) * i,
+                    offset: Math.random() * 200, // Variación en el inicio
+                    speed: 0.05 + Math.random() * 0.05, // Velocidad individual
+                    colorIndex: Math.floor(Math.random() * 2) // 0 para pink, 1 para cyan
+                });
+            }
+        }
+
+        let tunnelAnimationSpeed = 0;
+        function drawTunnel() {
+            ctx.fillStyle = 'rgba(0,0,0,0.15)'; // Fondo oscuro para un efecto de estela
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            tunnelAnimationSpeed += 0.01; // Velocidad general de rotación del túnel
+
+            lines.forEach(l => {
+                let color = l.colorIndex === 0 ? 'rgba(255, 0, 127, 0.8)' : 'rgba(0, 242, 255, 0.8)'; // Pink o Cyan
+                ctx.beginPath();
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 1.5 + Math.sin(l.offset + tunnelAnimationSpeed * 2) * 1; // Grosor variable
+                
+                // Mover los puntos de inicio/fin para el efecto 3D
+                let startX = centerX + Math.cos(l.angle + tunnelAnimationSpeed * l.speed) * 50; // Punto cercano
+                let startY = centerY + Math.sin(l.angle + tunnelAnimationSpeed * l.speed) * 50;
+
+                let endX = centerX + Math.cos(l.angle + tunnelAnimationSpeed * l.speed * 0.5) * canvas.width * 0.8; // Punto lejano
+                let endY = centerY + Math.sin(l.angle + tunnelAnimationSpeed * l.speed * 0.5) * canvas.height * 0.8;
+
+                ctx.moveTo(startX, startY);
+                ctx.lineTo(endX, endY);
+                ctx.stroke();
+            });
+            requestAnimationFrame(drawTunnel);
+        }
+
+        window.addEventListener('resize', initTunnel);
+        initTunnel();
+        drawTunnel();
+
+        // --- LÓGICA DE INTRO Y APP ---
+        function startLoading() {
+            const loadingBar = document.getElementById('loading-bar');
+            loadingBar.style.width = '100%';
+
+            setTimeout(() => {
+                document.getElementById('intro-overlay').style.opacity = '0';
+                // Lanzar confeti al finalizar la carga
+                confetti({
+                    particleCount: 180,
+                    spread: 90,
+                    origin: { y: 0.6 },
+                    colors: [var_to_hex('--pink'), var_to_hex('--cyan'), '#ffffff', '#ffcc00']
+                });
+
+                setTimeout(() => {
+                    document.getElementById('intro-overlay').style.display = 'none';
+                    document.getElementById('scrollContainer').style.display = 'block';
+                    // Inicializar Observer para animaciones de scroll
+                    setupScrollAnimations();
+                }, 800); // Duración de la transición de opacidad
+            }, 3000); // Corresponde a la duración del 'width' transition
+        }
+
+        // Función auxiliar para obtener valores CSS (para confeti)
+        function var_to_hex(variableName) {
+            const tempDiv = document.createElement('div');
+            tempDiv.style.color = `var(${variableName})`;
+            document.body.appendChild(tempDiv);
+            const color = window.getComputedStyle(tempDiv).color;
+            document.body.removeChild(tempDiv);
+            
+            // Convertir rgb() a #hex
+            const rgb = color.match(/\d+/g);
+            if (rgb) {
+                return '#' + ('0' + parseInt(rgb[0], 10).toString(16)).slice(-2) +
+                       ('0' + parseInt(rgb[1], 10).toString(16)).slice(-2) +
+                       ('0' + parseInt(rgb[2], 10).toString(16)).slice(-2);
+            }
+            return variableName; // Devuelve el nombre si no puede convertir
+        }
+
+        window.onload = startLoading; // Inicia la carga al cargar la página
+
+        // --- LÓGICA DE CONTADOR ---
+        const targetDate = new Date("Feb 21, 2026 20:00:00").getTime();
+        setInterval(() => {
+            const now = new Date().getTime();
+            const diff = targetDate - now;
+
+            if (diff > 0) {
+                document.getElementById("days").innerText = Math.floor(diff / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');
+                document.getElementById("hours").innerText = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(2, '0');
+                document.getElementById("mins").innerText = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
+                document.getElementById("secs").innerText = Math.floor((diff % (1000 * 60)) / 1000).toString().padStart(2, '0');
+            } else {
+                // Si la fecha ya pasó
+                document.getElementById("days").innerText = "00";
+                document.getElementById("hours").innerText = "00";
+                document.getElementById("mins").innerText = "00";
+                document.getElementById("secs").innerText = "00";
+            }
+        }, 1000);
+
+        // --- ANIMACIONES AL HACER SCROLL (Intersection Observer) ---
+        function setupScrollAnimations() {
+            const sections = document.querySelectorAll('.section-wrapper');
+            const observerOptions = {
+                root: document.getElementById('scrollContainer'),
+                threshold: 0.3 // Cuando el 30% de la sección es visible
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    } else {
+                        // Opcional: Si quieres que la animación se revierta al salir de la vista
+                        entry.target.classList.remove('visible');
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+        }
+    </script>
+</body>
+</html>

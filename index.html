@@ -20,10 +20,10 @@
         /* CAPA DE LÁSERES SOBRE EL GIF */
         #tunnelCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0.6; }
 
-        /* INTRO Y BARRA */
+        /* INTRO Y BARRA DE CARGA */
         #intro-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); display: flex; flex-direction: column;
+            background: rgba(0,0,0,0.92); display: flex; flex-direction: column;
             justify-content: center; align-items: center; z-index: 100;
             text-align: center; transition: opacity 0.8s ease; cursor: pointer;
         }
@@ -37,7 +37,7 @@
         #intro-text {
             font-family: 'Pacifico', cursive; color: var(--pink); font-size: 1.6rem;
             text-shadow: 0 0 15px var(--pink); margin: 20px 0;
-            display: none; /* Se activa al dar click */
+            display: none;
         }
 
         #loading-bar-container {
@@ -48,7 +48,7 @@
         }
         #loading-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--cyan), var(--pink)); transition: width 4s linear; }
 
-        /* CONTENIDO */
+        /* CONTENIDO DE INVITACIÓN */
         .scroll-container { width: 100%; height: 100vh; overflow-y: auto; display: none; padding: 20px 15px; position: relative; z-index: 1; }
         .section-wrapper {
             margin: 30px auto; max-width: 340px; width: 100%;
@@ -59,21 +59,25 @@
         .section-wrapper.visible { opacity: 1; transform: translateY(0); }
         .card { background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); border-radius: 22px; padding: 25px; text-align: center; }
 
+        /* ESTILO FOTO */
         .photo-container { position: relative; width: 110px; height: 110px; margin: 0 auto 15px; }
         .hanni-photo { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid white; position: relative; z-index: 2; }
         .photo-glow { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; background: var(--pink); filter: blur(15px); animation: neonPulse 1.5s infinite alternate; z-index: 1; }
         @keyframes neonPulse { from { opacity: 0.4; transform: scale(1); } to { opacity: 1; transform: scale(1.2); } }
 
+        /* CONTADOR */
         .countdown { display: flex; justify-content: space-between; gap: 5px; margin: 15px 0; }
         .box { background: rgba(255, 255, 255, 0.05); flex: 1; padding: 10px 2px; border-radius: 12px; border: 1px solid var(--cyan); }
         .box span { display: block; font-size: 1.2rem; font-weight: 900; color: var(--cyan); }
         .box small { font-size: 0.5rem; }
 
+        /* DJ LOCO VIT */
         .dj-section { position: relative; padding: 10px 0; }
         .dj-logo { width: 130px; filter: drop-shadow(0 0 10px var(--cyan)); margin-bottom: 5px; }
         .flame { position: absolute; width: 25px; height: 25px; background: radial-gradient(circle, #ff4500, transparent 70%); border-radius: 50%; filter: blur(4px); animation: fireMove 0.8s infinite alternate; opacity: 0.7; z-index: 3; }
         @keyframes fireMove { from { transform: translateY(0) scale(1); opacity: 0.4; } to { transform: translateY(-25px) scale(1.4); opacity: 0.8; } }
 
+        /* BOTONES */
         .btn { display: block; width: 100%; padding: 15px; margin: 10px 0; border-radius: 50px; text-decoration: none; font-weight: 800; text-transform: uppercase; font-size: 0.8rem; transition: 0.3s; color: white; position: relative; overflow: hidden; text-align: center; }
         .btn-wa { background: var(--pink); }
         .btn-maps { border: 2px solid var(--cyan); background: transparent; }
@@ -90,7 +94,7 @@
     <canvas id="tunnelCanvas"></canvas>
 
     <div id="intro-overlay">
-        <div id="click-msg">DA CLICK EN LA PANTALLA 🔊</div>
+        <div id="click-msg">DA CLICK EN LA PANTALLA PARA EMPEZAR 🔊</div>
         <div id="intro-text">FESTEJEMOS MI CUMPLE <br> CON EL MEJOR DESMADRE</div>
         <div id="loading-bar-container">
             <div id="loading-bar"></div>
@@ -98,6 +102,7 @@
     </div>
 
     <div class="scroll-container" id="scrollContainer">
+        
         <div class="section-wrapper">
             <div class="card">
                 <div class="photo-container"><div class="photo-glow"></div><img src="hanni.jpeg" class="hanni-photo"></div>
@@ -133,9 +138,9 @@
 
         <div class="section-wrapper">
             <div class="card">
-                <a href="https://wa.me/525587216277?text=¡Confirmado! 🥳" class="btn btn-wa">CONFIRMAR</a>
-                <a href="https://maps.app.goo.gl/AQUI_TU_LINK" class="btn btn-maps" target="_blank">UBICACIÓN</a>
-                <p style="color: #ffcc00; font-size: 0.7rem; margin-top: 15px; font-weight: bold;">⚠️ NO OLVIDES LO QUE QUIERAS TOMAR</p>
+                <a href="https://wa.me/525587216277?text=¡Confirmado! Ahí estaré en tus 21 🥳" class="btn btn-wa">CONFIRMAR ASISTENCIA</a>
+                <a href="https://www.google.com/maps/dir/19.5445045,-99.0758604/19.544507,-99.075862/@19.5445166,-99.0784656,17z/data=!3m1!4b1!4m4!4m3!1m1!4e1!1m0?entry=ttu&g_ep=EgoyMDI2MDEyNS4wIKXMDSoKLDEwMDc5MjA2OUgBUAM%3D" class="btn btn-maps" target="_blank">VER UBICACIÓN</a>
+                <p style="color: #ffcc00; font-size: 0.7rem; margin-top: 15px; font-weight: bold;">⚠️ TRAE LO QUE QUIERAS TOMAR</p>
             </div>
         </div>
     </div>
@@ -148,11 +153,10 @@
             if (started) return;
             started = true;
             
-            // 1. Activar Audio
             audio.volume = 1;
             audio.play();
 
-            // 2. Temporizador para bajar volumen (Fade out a los 30s)
+            // Desvanecer música a los 30 segundos
             setTimeout(() => {
                 let fadeInterval = setInterval(() => {
                     if (audio.volume > 0.05) {
@@ -161,15 +165,13 @@
                         audio.pause();
                         clearInterval(fadeInterval);
                     }
-                }, 200); // Baja el volumen cada 200ms
-            }, 30000); // Empieza a los 30 segundos
+                }, 200);
+            }, 30000);
 
-            // 3. Animaciones Intro
             document.getElementById('click-msg').style.display = 'none';
             document.getElementById('intro-text').style.display = 'block';
             document.getElementById('loading-bar-container').style.display = 'block';
             
-            // Forzar reflow para que la transición de la barra funcione
             setTimeout(() => {
                 document.getElementById('loading-bar').style.width = '100%';
             }, 50);
@@ -183,10 +185,10 @@
                     document.getElementById('scrollContainer').style.display = 'block';
                     setupObserver();
                 }, 800);
-            }, 4000); // 4 segundos de carga
+            }, 4000); 
         }
 
-        // --- CANVAS LÁSER ---
+        // --- LÁSERES CANVAS ---
         const canvas = document.getElementById('tunnelCanvas');
         const ctx = canvas.getContext('2d');
         function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
@@ -197,7 +199,7 @@
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             const cx = canvas.width / 2;
             const cy = canvas.height / 2;
-            for(let i = 0; i < 10; i++) {
+            for(let i = 0; i < 8; i++) {
                 ctx.beginPath();
                 ctx.strokeStyle = i % 2 ? '#ff007f' : '#00f2ff';
                 ctx.lineWidth = 1;
@@ -209,7 +211,7 @@
         }
         draw();
 
-        // --- OBSERVER ---
+        // --- OBSERVER PARA ANIMACIÓN AL SCROLLEAR ---
         function setupObserver() {
             const obs = new IntersectionObserver((entries) => {
                 entries.forEach(e => {
